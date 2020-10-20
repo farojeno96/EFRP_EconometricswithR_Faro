@@ -1,48 +1,48 @@
-# EFRP_EconometricswithR_Faro
-Use of information criteria in model selection
+        #EFRP_EconometricswithR_Faro
+        Use of information criteria in model selection
 
 
-# structure:
-# list X stores all relevant information
-  # the elements of X are other lists ("say Y-s"DGP_[n]"s), each storing information for 
-  # different data generating processes (dgp-s)
-    # the "DGP_[n]" lists store the dgp parameters ("DGP_[n]$gdp_parameters"),
-    # the simulated trajectories ("DGP_[n]$trajectories"), the model selection parameters 
-    # (in "DGP_[n]$modelling$model_[n]$model_selection_params) and the
-    # "chosen_orders" matrix (in "DGP_[n]$modelling$model_[n]$chosen_orders")
-    # in which the (i,j) element is the ratio "(times ARMA(i,j) was chosen)/
-    # (number of simulated trajectories)
+        #structure:
+        # list X stores all relevant information
+        # the elements of X are other lists ("say Y-s"DGP_[n]"s), each storing information for 
+        # different data generating processes (dgp-s)
+        # the "DGP_[n]" lists store the dgp parameters ("DGP_[n]$gdp_parameters"),
+        # the simulated trajectories ("DGP_[n]$trajectories"), the model selection parameters 
+        # (in "DGP_[n]$modelling$model_[n]$model_selection_params) and the
+        # "chosen_orders" matrix (in "DGP_[n]$modelling$model_[n]$chosen_orders")
+        # in which the (i,j) element is the ratio "(times ARMA(i,j) was chosen)/
+        # (number of simulated trajectories)
 
-def_dgp_parameters <- function(X, p_lag, q_lag, ar_coefs, ma_coefs, 
+    def_dgp_parameters <- function(X, p_lag, q_lag, ar_coefs, ma_coefs, 
                                intercept, len = 100, noise = 1){
   
-  # stores the data generating process parameters in list "dgp_param".
-  # returns list "X" with dgp_param" as first elemenet.
-  # X will store all other values related to the analysis
+    # stores the data generating process parameters in list "dgp_param".
+    # returns list "X" with dgp_param" as first elemenet.
+    # X will store all other values related to the analysis
   
-  # inputs: 
-    #analysis storage list X
-    # DGP parameters
+    # inputs: 
+      #analysis storage list X
+      # DGP parameters
   
-  # store parameters:
-  dgp_case <- list()      # this list contains all relevant info for this DGP
-  dgp_parameters <- list()
-  dgp_parameters$ts_length <- len
-  dgp_parameters$noise <- noise
-  dgp_parameters$p_lags <- p_lag
-  dgp_parameters$q_lags <- q_lag
-  dgp_parameters$intercept <- intercept
-  dgp_parameters$ar_coefs <- ar_coefs
-  dgp_parameters$ma_coefs <- ma_coefs
-  dgp_parameters$sim_num <- 1000
+    # store parameters:
+        dgp_case <- list()      # this list contains all relevant info for this DGP
+        dgp_parameters <- list()
+        dgp_parameters$ts_length <- len
+        dgp_parameters$noise <- noise
+        dgp_parameters$p_lags <- p_lag
+        dgp_parameters$q_lags <- q_lag
+        dgp_parameters$intercept <- intercept
+        dgp_parameters$ar_coefs <- ar_coefs
+        dgp_parameters$ma_coefs <- ma_coefs
+        dgp_parameters$sim_num <- 1000
   
-  dgp_case$dgp_parameters <- dgp_parameters
+        dgp_case$dgp_parameters <- dgp_parameters
   
-  # append DGP list to storage matrix X:
-  X[[length(X)+1]] <- dgp_case
+        # append DGP list to storage matrix X:
+        X[[length(X)+1]] <- dgp_case
   
-  # give name "DGP_[n]" key to the DGP list in X: 
-  names(X) <- c(names(X[1:length(names(X))-1]), paste0("DGP_", toString(length(X))))
+         # give name "DGP_[n]" key to the DGP list in X: 
+        names(X) <- c(names(X[1:length(names(X))-1]), paste0("DGP_", toString(length(X))))
   
   #Check whether the process determined by the ARMA coefficients is stationary
   #It is carried out with the help of the phi-polinom
@@ -67,40 +67,40 @@ def_dgp_parameters <- function(X, p_lag, q_lag, ar_coefs, ma_coefs,
 }
 
 simulate_dgp <- function(X, dgp_index){
-  # simulates the DGP defined in "dgp_parameters" times "dgp_parameters$sim_num"
-  # stores the sim_num different trajectories in a matrix (size= ts_length * sim_num)
+    # simulates the DGP defined in "dgp_parameters" times "dgp_parameters$sim_num"
+    # stores the sim_num different trajectories in a matrix (size= ts_length * sim_num)
     # where each column is a different trajecotry
-  # appends the matrix to X$DGP_[n]$trajectories  
+    # appends the matrix to X$DGP_[n]$trajectories  
   
-  # inputs: 
-    # the storage list X
-    # the index of the DGP in X; eg. for dgp_index = 1, values used in the simulation
-    # are taken from "X$DGP_1$..."
+    # inputs: 
+      # the storage list X
+      # the index of the DGP in X; eg. for dgp_index = 1, values used in the simulation
+      # are taken from "X$DGP_1$..."
   
-  # take parameters from "X$DGP_[n]$dgp_parameters:
-  ts_length <- X[[dgp_index]]$dgp_parameters$ts_length
-  noise <- X[[dgp_index]]$dgp_parameters$noise
-  p_lags <- X[[dgp_index]]$dgp_parameters$p_lags
-  q_lags <- X[[dgp_index]]$dgp_parameters$q_lags
-  intercept <- X[[dgp_index]]$dgp_parameters$intercept
-  ar_coefs <- X[[dgp_index]]$dgp_parameters$ar_coefs
-  ma_coefs <- X[[dgp_index]]$dgp_parameters$ma_coefs
-  sim_num <- X[[dgp_index]]$dgp_parameters$sim_num
+    # take parameters from "X$DGP_[n]$dgp_parameters:
+        ts_length <- X[[dgp_index]]$dgp_parameters$ts_length
+        noise <- X[[dgp_index]]$dgp_parameters$noise
+        p_lags <- X[[dgp_index]]$dgp_parameters$p_lags
+        q_lags <- X[[dgp_index]]$dgp_parameters$q_lags
+        intercept <- X[[dgp_index]]$dgp_parameters$intercept
+        ar_coefs <- X[[dgp_index]]$dgp_parameters$ar_coefs
+        ma_coefs <- X[[dgp_index]]$dgp_parameters$ma_coefs
+        sim_num <- X[[dgp_index]]$dgp_parameters$sim_num
   
 
   trajectories <- matrix(nrow = ts_length, ncol = sim_num)  
   
-  # calculate expected value of ARMA(p,q) process:
-  expected_value <- intercept/(1-sum(ar_coefs))
+    # calculate expected value of ARMA(p,q) process:
+    expected_value <- intercept/(1-sum(ar_coefs))
+    
+    # "lengthening" length of the time series because of the lags:
+    lengthening <- max(q_lags,p_lags)
   
-  # "lengthening" length of the time series because of the lags:
-  lengthening <- max(q_lags,p_lags)
-  
-  # simulate errors with variance = noise:
+    # simulate errors with variance = noise:
   Us <- rnorm(n = sim_num * (ts_length + lengthening), sd = noise)
   Us <- matrix(Us, nrow = (ts_length + lengthening), ncol = sim_num, byrow = FALSE) 
   
-  # simulate the trajectories:
+    # simulate the trajectories:
   trajectories <- matrix(nrow = (ts_length + lengthening), ncol = sim_num)
   
   for (t in c(1:(ts_length+lengthening))){
@@ -113,10 +113,10 @@ simulate_dgp <- function(X, dgp_index){
     }
   }
   
-  # drop data only used for generation ("lengthening"):
+    # drop data only used for generation ("lengthening"):
   trajectories <- trajectories[(lengthening+1):nrow(trajectories),]
   
-  # store trajectories in storage matrix X
+    # store trajectories in storage matrix X
   X[[dgp_index]]$trajectories <- trajectories
   
   return(X)
@@ -125,23 +125,23 @@ simulate_dgp <- function(X, dgp_index){
 
 def_model_fitting_params <- function(X, dgp_index, inf_criterion, max_p = 4, max_q = 4){
   
-  # stores model selection parameters in storage matrix X
+    # stores model selection parameters in storage matrix X
   
-  # inputs:
-    # storage list X
-    # the index of the DGP in X; eg. for dgp_index = 1, values used in the simulation
-    # inf_criterion used for model selection: either "aic" (Akaike Information Criterion) or
-    # "bic" (Bayesian Information Criterion)
-    # maximum number of p and q lags considered
+    # inputs:
+      # storage list X
+      # the index of the DGP in X; eg. for dgp_index = 1, values used in the simulation
+      # inf_criterion used for model selection: either "aic" (Akaike Information Criterion) or
+      # "bic" (Bayesian Information Criterion)
+      # maximum number of p and q lags considered
   
   
-  # store model_params in list
+    # store model_params in list
   model_params <- list("inf_crit" = inf_criterion,
                        "max_p_order" = max_p, "max_q_order" = max_q)
   
-  # create storage place for the model in X and store it:
+    # create storage place for the model in X and store it:
   
-  # if "modelling" exists in X, pull it, otherwise create it
+     # if "modelling" exists in X, pull it, otherwise create it
   if ( "modelling" %in% names(X[[dgp_index]])){
     modelling <- X[[dgp_index]]$modelling
   } else {
@@ -154,7 +154,7 @@ def_model_fitting_params <- function(X, dgp_index, inf_criterion, max_p = 4, max
   modelling[[length(modelling) + 1]] <- new_model
   X[[dgp_index]]$modelling <- modelling
   
-  # give name "model_[n]" key to the model list in X: 
+    # give name "model_[n]" key to the model list in X: 
   names(X[[dgp_index]]$modelling) <- 
     c(names(X[[dgp_index]]$modelling[1:length(names(X[[dgp_index]]$modelling))-1]), 
                                        paste0("model_", toString(length(X[[dgp_index]]$modelling))))
@@ -164,14 +164,14 @@ def_model_fitting_params <- function(X, dgp_index, inf_criterion, max_p = 4, max
 }
 
 model_fitting <- function(X,dgp_index, model_index){
-  # fits different ARIMA(p,q) models to the simulated trajectiories in X[[dgp_index]]$trajectories
-  # p,q orders go from (0,0) to (map_p, max_q) defined in
-  # X[[dgp_index]]$modelling[[model_index]]$model_selection_params
-  # returns X with a "chosen_orders" matrix attached:  
-  # in which the (i,j) element is the ratio "(times ARMA(i,j) was chosen)/
-  # (number of simulated trajectories)
+    # fits different ARIMA(p,q) models to the simulated trajectiories in X[[dgp_index]]$trajectories
+    # p,q orders go from (0,0) to (map_p, max_q) defined in
+    # X[[dgp_index]]$modelling[[model_index]]$model_selection_params
+    # returns X with a "chosen_orders" matrix attached:  
+    # in which the (i,j) element is the ratio "(times ARMA(i,j) was chosen)/
+    # (number of simulated trajectories)
   
-  # take parameters from X
+    # take parameters from X
   max_p  <- X[[dgp_index]]$modelling[[model_index]]$model_selection_params$max_p_order
   max_q  <- X[[dgp_index]]$modelling[[model_index]]$model_selection_params$max_q_order
   inf_crit_used <- X[[dgp_index]]$modelling[[model_index]]$model_selection_params$inf_crit
@@ -180,7 +180,7 @@ model_fitting <- function(X,dgp_index, model_index){
   #initialize result storage matrix
   chosen_orders <- matrix(0, nrow = (max_p + 1), ncol = (max_q + 1))
   
-  # name columns and rows like "q = 1" etc...
+    # name columns and rows like "q = 1" etc...
   colname <- rep("q = ", times = (max_q +1))
   rowname <- rep("p = ", times = (max_p + 1))
   for (col_num in 1:(max_q+1)){
@@ -193,11 +193,11 @@ model_fitting <- function(X,dgp_index, model_index){
   colnames(chosen_orders) <- colname
   rownames(chosen_orders) <- rowname
   
-  # iterate over each trajectory in trajectories matrix
-  # iterate over each p,q pair
-  # fit arma(p,q) model for each pair
-  # choose best (p_0,q_0) order based on inf criterion
-  # add +1 to cell (p_0,q_0) in the chosen_orders matrix
+    # iterate over each trajectory in trajectories matrix
+    # iterate over each p,q pair
+    # fit arma(p,q) model for each pair
+    # choose best (p_0,q_0) order based on inf criterion
+    # add +1 to cell (p_0,q_0) in the chosen_orders matrix
   
   
   for (column in 1:ncol(X[[dgp_index]]$trajectories)){ 
@@ -231,7 +231,7 @@ model_fitting <- function(X,dgp_index, model_index){
 create_summary_table <- function(X, inf_crit_investigated = c("aic", "bic"), p_lags = 1, q_lags = 1){
   
    true_ratio <- matrix(0, nrow = length(possible_length_values), ncol = length(noise_levels))
-  # name columns and rows like "q = 1" etc...
+    # name columns and rows like "q = 1" etc...
   colname <- rep("noise = ", times = (length(noise_levels)))
   rowname <- rep("n = ", times = (length(possible_length_values)))
   
@@ -265,8 +265,8 @@ create_summary_table <- function(X, inf_crit_investigated = c("aic", "bic"), p_l
 }
 
   
-# example:
-# how to use the functions:
+    # example:
+    # how to use the functions:
 
 X <- list()
 X <- def_dgp_parameters(X, len = 25, noise = 0.5, p_lag = 1, q_lag = 1, 
